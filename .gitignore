@@ -1,0 +1,15 @@
+# CVS ignore
+**/CVS/
+**/target/
+
+# Idea files
+**/*.iws
+**/*.ipr
+**/*.iml
+**/.idea
+**/.\#*
+
+**/log/
+**/temp
+**/tasktemp
+**/data/

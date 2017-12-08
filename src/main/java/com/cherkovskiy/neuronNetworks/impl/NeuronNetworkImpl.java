@@ -14,7 +14,7 @@ public class NeuronNetworkImpl implements NeuronNetwork {
     private final int inputAmount;
     private final Double[][] topology; //TODO: simplify - get rid of boxing/unboxing
     private final int outputAmount;
-    private final double learnRate = 0.5;
+    private final double learnRate = 0.01;
     private DebugLevels debugLevel = DebugLevels.ERROR;
     private float stopRelativeError = 0.1f; // not more 10% in each output
 
@@ -24,12 +24,14 @@ public class NeuronNetworkImpl implements NeuronNetwork {
         this.outputAmount = outputAmount;
         this.activationFunction = activationFunction;
         this.stopRelativeError = stopRelativeError;
+
+        COMMON_LOGGER.debug(this.toString());
     }
 
     @Override
     public NeuronNetworkOutput process(NeuronNetworkInput input) {
         if (input.size() != inputAmount) {
-            throw new IllegalArgumentException(String.format("Incompatible input: size of input array is %d != NeuronNetworkImpl amount of input neurons %d", input.size(), inputAmount));
+            throw new IllegalArgumentException(String.format("Incompatible input: size of input array is %d != %d NeuronNetworkImpl amount of input neurons", input.size(), inputAmount));
         }
         final List<Double> inputVector = new LinkedList<>();
         inputVector.addAll(input.getInput());
@@ -59,7 +61,19 @@ public class NeuronNetworkImpl implements NeuronNetwork {
 
     @Override
     public void learnBackProp(NeuronNetworkTrainSets neuronNetworkTrainSet) {
-        //TODO: check size before process!
+        neuronNetworkTrainSet.forEach(trainSet -> {
+            if (trainSet.getInput().size() != inputAmount) {
+                throw new IllegalArgumentException(String.format(
+                        "Incompatible input: size of input array is %d != %d NeuronNetworkImpl amount of input neurons",
+                        trainSet.getInput().size(), inputAmount));
+            }
+
+            if (trainSet.getOutput().getOutput().size() != outputAmount) {
+                throw new IllegalArgumentException(String.format(
+                        "Incompatible output: size of output array is %d != %d NeuronNetworkImpl amount of output neurons",
+                        trainSet.getOutput().getOutput().size(), outputAmount));
+            }
+        });
 
         double currentMinEuclidError = Double.MAX_VALUE;
         double fullRelativeError = 100d;

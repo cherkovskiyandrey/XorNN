@@ -27,7 +27,7 @@
     <logger name="CommonLogger" additivity="false">
         <level value="debug" />
         <appender-ref ref="AsyncCommonAppender"/>
-        <appender-ref ref="console" />
+        <!--<appender-ref ref="console" />-->
     </logger>
 </log4j:configuration>
 

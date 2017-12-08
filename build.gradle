@@ -13,18 +13,17 @@ repositories {
     jcenter()
 }
 
-configurations {
-    compile.exclude module: 'log4j'
-    compile.exclude module: 'log4j-over-slf4j'
-    compile.exclude module: 'slf4j-log4j12'
-}
-
 compileJava {
     options.encoding = "UTF-8"
 }
 
 dependencies {
     compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
-	compile group: 'log4j', name: 'log4j', version: '1.2.17'
-	compile "org.apache.commons:commons-lang3:${project['commons-lang3.version']}"
+
+    compile group: 'log4j', name: 'log4j', version: '1.2.17'
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+
+
+    compile "org.apache.commons:commons-lang3:${project['commons-lang3.version']}"
 }

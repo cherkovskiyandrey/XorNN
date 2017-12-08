@@ -4,9 +4,12 @@ import com.cherkovskiy.neuronNetworks.api.*;
 
 import java.io.OutputStream;
 import java.util.*;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NeuronNetworkImpl implements NeuronNetwork {
+    private static final Logger COMMON_LOGGER = LoggerFactory.getLogger("CommonLogger");
+
     private final ActivationFunction activationFunction;
     private final int inputAmount;
     private final Double[][] topology; //TODO: simplify - get rid of boxing/unboxing
@@ -81,19 +84,16 @@ public class NeuronNetworkImpl implements NeuronNetwork {
             epochNumber++;
 
             if (debugLevel.doOut(epochNumber)) {
-                System.out.println(this);
+                COMMON_LOGGER.debug(this.toString());
             }
 
             if (debugLevel.isLessThanOrEqual(DebugLevels.INFO)) {
-                System.out.println("----------------------");
-                System.out.println("| Epoch: " + epochNumber +
+                String message = "| Epoch: " + epochNumber +
                         "; full relative error: " + fullRelativeError +
                         "; current error: " + fullEuclidError +
                         "; min error: " + currentMinEuclidError +
-                        "; TREND: " + (fullEuclidError > currentMinEuclidError ? "!!!ascent!!!" : "decent")
-                );
-                System.out.println("----------------------");
-                System.out.println("==============================================");
+                        "; TREND: " + (fullEuclidError > currentMinEuclidError ? "!!!ascent!!!" : "decent");
+                COMMON_LOGGER.debug(message);
             }
         }
 
@@ -102,7 +102,7 @@ public class NeuronNetworkImpl implements NeuronNetwork {
 //                final NeuronNetworkOutput neuronNetworkOutput = process(trainSet.getInput());
 //                logAllNets(neuronNetworkOutput);
 //            }
-//            System.out.println(this);
+//            COMMON_LOGGER.debug(this.toString());
 //        }
     }
 
@@ -169,7 +169,7 @@ public class NeuronNetworkImpl implements NeuronNetwork {
         applyDeltaRates(deltaRates);
 
         if (debugLevel.isLessThanOrEqual(DebugLevels.DEBUG)) {
-            System.out.println(this);
+            COMMON_LOGGER.debug(this.toString());
         }
 
         return Pair.of(calcEuclideError(teachOutput, currentOutput), calcRelativeError(teachOutput, currentOutput));
@@ -200,7 +200,7 @@ public class NeuronNetworkImpl implements NeuronNetwork {
         for (double outputVal : output.getOutput()) {
             inputStr.append(String.format("|%14.10f|", outputVal));
         }
-        System.out.println(inputStr.toString());
+        COMMON_LOGGER.debug(inputStr.toString());
     }
 
     private void logAllNets(NeuronNetworkOutput neuronNetworkOutput) {
@@ -209,7 +209,7 @@ public class NeuronNetworkImpl implements NeuronNetwork {
             outStr.append(String.format("|%10.5f|", outputVal));
         }
 
-        System.out.println(outStr.toString());
+        COMMON_LOGGER.debug(outStr.toString());
     }
 
     private List<Integer> getUpStream(int currentNeuronIndex) {

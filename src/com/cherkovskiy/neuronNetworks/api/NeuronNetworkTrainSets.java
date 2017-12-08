@@ -7,4 +7,6 @@ public interface NeuronNetworkTrainSets extends Iterable<NeuronNetworkTrainSets.
 
         NeuronNetworkOutput getOutput();
     }
+
+    long getSize();
 }

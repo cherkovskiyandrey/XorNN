@@ -1,23 +1,23 @@
 package com.cherkovskiy.neuronNetworks.impl;
 
 class Pair<T, U> {
-    private final T t;
-    private final U u;
+    private final T first;
+    private final U second;
 
-    Pair(T t, U u) {
-        this.t = t;
-        this.u = u;
+    Pair(T first, U second) {
+        this.first = first;
+        this.second = second;
     }
 
-    static <T1, U1> Pair<T1, U1> of(T1 input, U1 output) {
-        return new Pair<>(input, output);
+    static <T1, U1> Pair<T1, U1> of(T1 first, U1 second) {
+        return new Pair<>(first, second);
     }
 
-    public T getT() {
-        return t;
+    public T getFirst() {
+        return first;
     }
 
-    public U getU() {
-        return u;
+    public U getSecond() {
+        return second;
     }
 }

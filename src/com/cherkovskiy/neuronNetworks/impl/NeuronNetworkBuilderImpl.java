@@ -17,6 +17,7 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
     private int input;
     private LinkedList<Integer> hiddenLevels = new LinkedList<>();
     private int output;
+    private float stopRelativeError;
 
     public NeuronNetworkBuilder setType(NeuronNetworkType type) {
         this.type = type;
@@ -57,6 +58,12 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
         return this;
     }
 
+    @Override
+    public NeuronNetworkBuilder setStopRelativeError(float percentInEachOut) {
+        this.stopRelativeError = percentInEachOut;
+        return this;
+    }
+
     public NeuronNetwork build() {
         int allNeurons = input + hiddenLevels.stream().mapToInt(Integer::intValue).sum() + output;
         final Double[][] topology = new Double[allNeurons][allNeurons];
@@ -66,18 +73,27 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
         for (int levelAmount : Stream.concat(hiddenLevels.stream(), Stream.of(output)).collect(Collectors.toList())) {
             for (int levelNeuron = levelEnd; levelNeuron < levelEnd + levelAmount; levelNeuron++) {
                 for (int prevLevelNeuron = levelBegin; prevLevelNeuron < levelEnd; prevLevelNeuron++) {
-                    topology[levelNeuron][prevLevelNeuron] = ThreadLocalRandom.current().nextDouble(-10, 10);
+                    topology[levelNeuron][prevLevelNeuron] = getNextRandom();
                 }
             }
             levelBegin = levelEnd;
             levelEnd = levelEnd + levelAmount;
         }
 
-        return new NeuronNetworkImpl(input, topology, output, activationFunction);
+        return new NeuronNetworkImpl(input, topology, output, activationFunction, stopRelativeError);
     }
 
     @Override
     public NeuronNetwork build(InputStream fromXml) {
         throw new UnsupportedOperationException("Method has not been supported yet.");
+    }
+
+    private static Double getNextRandom() {
+        while (true) {
+            double val = ThreadLocalRandom.current().nextDouble(-0.5, 0.5);
+            if (Math.abs(val) > 1.E-5) {
+                return val;
+            }
+        }
     }
 }

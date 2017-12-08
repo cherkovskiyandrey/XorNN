@@ -1,0 +1,10 @@
+//TODO: implement first of all!
+xor.learnResilientProp(neuronNetworkTrainSet);
+
+//TODO: 5.6.4 Weight decay: Punishment of large weights
+
+//TODO: Flat spot elimination prevents neurons from getting stuck - НЕ НУЖЕН если используем апроксимацию гиперболического тангенса
+
+//TODO: реализовать алгоритм гибкого поиска оптимальной конфигурации: 5.7.1 Number of layers: Two or three may often do the job, but more are also used
+
+//TODO: think about how to escape from local minimums

@@ -8,7 +8,9 @@ public interface NeuronNetwork {
 
     void writeAsXml(OutputStream to);
 
-    void learn(NeuronNetworkTrainSets neuronNetworkTrainSet);
+    void learnBackProp(NeuronNetworkTrainSets neuronNetworkTrainSet);
 
-    boolean turnDebugOn(boolean debugMode);
+    void setDebugMode(DebugLevels debugLevel);
+
+    void learnResilientProp(NeuronNetworkTrainSets neuronNetworkTrainSet);
 }

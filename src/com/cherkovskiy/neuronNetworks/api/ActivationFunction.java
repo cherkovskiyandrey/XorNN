@@ -2,7 +2,9 @@ package com.cherkovskiy.neuronNetworks.api;
 
 public interface ActivationFunction {
 
-    Double activate(Double netInput);
+    double activate(double netInput);
 
-    Double derivative(Double netInput);
+    double derivative(double netInput);
+
+    double getRange();
 }

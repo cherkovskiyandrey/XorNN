@@ -33,15 +33,20 @@ class NeuronNetworkTrainSetInMemoryImpl implements NeuronNetworkTrainSets {
                 return new TrainSet() {
                     @Override
                     public NeuronNetworkInput getInput() {
-                        return origVal.getT();
+                        return origVal.getFirst();
                     }
 
                     @Override
                     public NeuronNetworkOutput getOutput() {
-                        return origVal.getU();
+                        return origVal.getSecond();
                     }
                 };
             }
         };
+    }
+
+    @Override
+    public long getSize() {
+        return trainInput.size();
     }
 }

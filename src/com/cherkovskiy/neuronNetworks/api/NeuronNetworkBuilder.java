@@ -16,6 +16,8 @@ public interface NeuronNetworkBuilder {
 
     NeuronNetworkBuilder setActivationFunction(ActivationFunction activationFunction);
 
+    NeuronNetworkBuilder setStopRelativeError(float percentInEachOut);
+
     /**
      * Build {@link NeuronNetwork} from options.
      *

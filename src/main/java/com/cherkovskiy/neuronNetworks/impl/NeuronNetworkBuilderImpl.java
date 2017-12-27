@@ -18,6 +18,9 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
     private LinkedList<Integer> hiddenLevels = new LinkedList<>();
     private int output;
     private float stopRelativeError;
+    private boolean useStatModule;
+    private double range;
+    private double step;
 
     public NeuronNetworkBuilder setType(NeuronNetworkType type) {
         this.type = type;
@@ -64,9 +67,18 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
         return this;
     }
 
+    @Override
+    public NeuronNetworkBuilder useStatModule(boolean b, double range, double step) {
+        this.useStatModule = b;
+        this.range = range;
+        this.step = step;
+        return this;
+    }
+
+
     public NeuronNetwork build() {
         int allNeurons = input + hiddenLevels.stream().mapToInt(Integer::intValue).sum() + output;
-        final Double[][] topology = new Double[allNeurons][allNeurons];
+        final double[][] topology = NeuronNetworkCoreHelper.nanArray(allNeurons, allNeurons);
         int levelBegin = 0;
         int levelEnd = input;
 
@@ -80,13 +92,18 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
             levelEnd = levelEnd + levelAmount;
         }
 
-        return new NeuronNetworkImpl(input, topology, output, activationFunction, stopRelativeError);
+        return new NeuronNetworkImpl(
+                new NeuronNetworkDomain(input, topology, output, activationFunction),
+                stopRelativeError,
+                useStatModule ? new StatisticsProvider(range, step) : null
+                );
     }
 
     @Override
     public NeuronNetwork build(InputStream fromXml) {
         throw new UnsupportedOperationException("Method has not been supported yet.");
     }
+
 
     private static Double getNextRandom() {
         while (true) {

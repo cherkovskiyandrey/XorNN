@@ -19,14 +19,34 @@
         </layout>
     </appender>
 
+    <appender name="StatAppender" class="org.apache.log4j.RollingFileAppender">
+        <param name="file" value="logs/stat.log" />
+        <param name="maxBackupIndex" value="100" />
+        <param name="maxFileSize" value="100MB" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{dd-MMM-yyyy HH:mm:ss,SSS zzz} %5p - %m%n" />
+        </layout>
+    </appender>
+
     <appender name="AsyncCommonAppender" class="org.apache.log4j.AsyncAppender">
         <param name="BufferSize" value="1024" />
         <appender-ref ref="CommonAppender" />
     </appender>
 
+    <appender name="AsyncStatAppender" class="org.apache.log4j.AsyncAppender">
+        <param name="BufferSize" value="1024" />
+        <appender-ref ref="StatAppender" />
+    </appender>
+
     <logger name="CommonLogger" additivity="false">
         <level value="debug" />
         <appender-ref ref="AsyncCommonAppender"/>
+        <!--<appender-ref ref="console" />-->
+    </logger>
+
+    <logger name="StatLogger" additivity="false">
+        <level value="trace" />
+        <appender-ref ref="AsyncStatAppender"/>
         <!--<appender-ref ref="console" />-->
     </logger>
 </log4j:configuration>

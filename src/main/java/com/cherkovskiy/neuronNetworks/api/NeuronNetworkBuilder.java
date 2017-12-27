@@ -18,6 +18,9 @@ public interface NeuronNetworkBuilder {
 
     NeuronNetworkBuilder setStopRelativeError(float percentInEachOut);
 
+
+    NeuronNetworkBuilder useStatModule(boolean b, double range, double step);
+
     /**
      * Build {@link NeuronNetwork} from options.
      *

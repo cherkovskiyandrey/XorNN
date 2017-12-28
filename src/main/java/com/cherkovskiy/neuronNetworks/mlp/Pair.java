@@ -1,4 +1,4 @@
-package com.cherkovskiy.neuronNetworks.impl;
+package com.cherkovskiy.neuronNetworks.mlp;
 
 class Pair<T, U> {
     private final T first;

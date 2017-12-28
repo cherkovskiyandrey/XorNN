@@ -1,4 +1,4 @@
-package com.cherkovskiy.neuronNetworks.impl;
+package com.cherkovskiy.neuronNetworks.mlp;
 
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkOutput;
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkOutputBuilder;

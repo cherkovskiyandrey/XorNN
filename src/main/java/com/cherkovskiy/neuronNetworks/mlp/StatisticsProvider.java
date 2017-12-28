@@ -1,4 +1,4 @@
-package com.cherkovskiy.neuronNetworks.impl;
+package com.cherkovskiy.neuronNetworks.mlp;
 
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkOutput;
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkTrainSets;
@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,3 +87,4 @@ class StatisticsProvider {
         STAT_LOGGER.trace(String.format("%d,%d => %s%s", i, j, System.lineSeparator(), str.toString()));
     }
 }
+

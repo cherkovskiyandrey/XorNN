@@ -1,7 +1,7 @@
 package com.cherkovskiy.neuronNetworks.api;
 
 
-import com.cherkovskiy.neuronNetworks.impl.NeuronNetworkServiceImpl;
+import com.cherkovskiy.neuronNetworks.mlp.NeuronNetworkServiceImpl;
 
 import javax.annotation.Nonnull;
 

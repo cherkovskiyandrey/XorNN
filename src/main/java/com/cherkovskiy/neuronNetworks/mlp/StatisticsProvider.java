@@ -2,6 +2,7 @@ package com.cherkovskiy.neuronNetworks.mlp;
 
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkOutput;
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkTrainSets;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
 
 @NotThreadSafe
 class StatisticsProvider {
@@ -43,16 +45,23 @@ class StatisticsProvider {
                     double beginRange = ratePrev - (range / 2);
                     double endRange = ratePrev + (range / 2);
 
-                    STAT_LOGGER.debug(String.format("%d,%d => rate prev: %f; rate cur: %f; delta: %f", i, j, ratePrev, rateCur, curDelta));
+                    STAT_LOGGER.debug(String.format("%d,%d => rate prev: %24.20f; rate cur: %24.20f; delta: %24.20f", i, j, ratePrev, rateCur, curDelta));
 
                     if (!Range.between(beginRange, endRange).contains(rateCur)) {
-                        STAT_LOGGER.warn(String.format("New value %f is out of range: %f <--> %f", rateCur, beginRange, endRange));
+                        STAT_LOGGER.warn(String.format("New value %24.20f is out of range: %24.20f <--> %24.20f", rateCur, beginRange, endRange));
                     }
 
                     //by scan range
                     final List<Pair<Double, Double>> errorDep = new ArrayList<>();
                     final NeuronNetworkDomain tmpTopology = begin.newClone();
+                    final SortedSet<Double> points = Sets.newTreeSet();
                     for (double k = beginRange; k < endRange; k += delta) {
+                        points.add(k);
+                    }
+                    points.add(rateCur);
+                    points.add(ratePrev);
+
+                    for (Double k : points) {
                         tmpTopology.getTopology()[i][j] = k;
 
                         // calc full ERROR
@@ -81,7 +90,7 @@ class StatisticsProvider {
     private void toLog(int i, int j, List<Pair<Double, Double>> errorDep) {
         StringBuilder str = new StringBuilder();
         errorDep.forEach(r -> {
-            str.append(String.format("          %f;%f%s", r.getFirst(), r.getSecond(), System.lineSeparator()));
+            str.append(String.format("          %24.20f;%24.20f%s", r.getFirst(), r.getSecond(), System.lineSeparator()));
         });
 
         STAT_LOGGER.trace(String.format("%d,%d => %s%s", i, j, System.lineSeparator(), str.toString()));

@@ -17,12 +17,17 @@ public class Main {
                 //.setActivationFunction(StandardActivationFunctions.SIGMOID) //регулярно застреваем - понять почему
                 .setActivationFunction(StandardActivationFunctions.HYPERBOLIC_TANG_ANGUITA) // работает действительно очень круто и быстро приходит к цели
                 .inputsNeurons(2)
-                .addHiddenLevel(3)
-                .addHiddenLevel(3)
-                .outputNeurons(1)
+                .addHiddenLevel(20)
+                .addHiddenLevel(20)
+                .addHiddenLevel(20)
+                .addHiddenLevel(20)
+                .outputNeurons(3)
                 .useBias(false)
-                .useStatModule(true, 1., 0.1)
-                .setStopRelativeError(0.05f) // error not more 1% for each out
+                .useStatModule(false, 1., 0.1)
+
+                //TODO:
+                .setStopRelativeError(0.05f) // error not more 1% for each out //TODO: переделать под новый подход
+                //.setStopCondition(1000, 10E-5) // типа если за 1000 циклов минимумальное значение не будет обнавлено больше чем на 10E-5 - заканчиваем
                 .build();
 
         final NeuronNetworkTrainSetBuilder neuronNetworkTrainSetBuilder = neuronNetworkService.createTrainSetBuilder();
@@ -32,28 +37,28 @@ public class Main {
         final NeuronNetworkTrainSets neuronNetworkTrainSet = neuronNetworkTrainSetBuilder
 
                 //Отлично обучается
-                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 0d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d)).build())
-                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(1d, 0d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d)).build())
-                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 1d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d)).build())
-                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(1d, 1d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d)).build())
+//                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 0d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d)).build())
+//                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(1d, 0d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d)).build())
+//                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 1d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d)).build())
+//                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(1d, 1d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d)).build())
 
                 //Так себе результаты - скатываемся иногда в локальный миниум и не можем из него вылезти - для сигмоида
                 //Для тангенса - private final double learnRate = 0.01; и получаем неплохой результат из которго быстро выпрыгиваем
-//                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 0d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d, 0d, 0d)).build())
-//                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 1d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d, 0d, 1d)).build())
-//                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 2d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d, 1d, 0d)).build())
-//                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 3d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d, 1d, 1d)).build())
-//                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 4d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d, 0d, 0d)).build())
-//                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 5d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d, 0d, 1d)).build())
-//                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 6d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d, 1d, 0d)).build())
-//                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 7d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d, 1d, 1d)).build())
+                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 0d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d, 0d, 0d)).build())
+                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 1d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d, 0d, 1d)).build())
+                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 2d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d, 1d, 0d)).build())
+                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 3d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d, 1d, 1d)).build())
+                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 4d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d, 0d, 0d)).build())
+                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 5d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d, 0d, 1d)).build())
+                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 6d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d, 1d, 0d)).build())
+                .setInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 7d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d, 1d, 1d)).build())
 
                 .build();
 
         //todo
         //final NeuronNetworkTrainSets neuronNetworkTrainSet = neuronNetworkTrainSetBuilder.build(new FileInputStream("some_trained_file"));
 
-        xor.setDebugMode(DebugLevels.TRACE);
+        xor.setDebugMode(DebugLevels.DEBUG_EVERY_10_000);
 
         xor.learnBackProp(neuronNetworkTrainSet);
 

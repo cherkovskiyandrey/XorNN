@@ -43,6 +43,8 @@ public class NeuronNetworkImpl implements NeuronNetwork {
         double currentMinEuclidError = Double.MAX_VALUE;
         double fullRelativeError = 100d;
         long epochNumber = 0;
+        boolean wasDecent = true;
+        System.out.println("decent");
 
         //while (fullRelativeError > stopRelativeError) { //TODO: см questions.txt "Изменить подход остановки обучения"
         double fullEuclidError = Double.MAX_VALUE;
@@ -61,6 +63,10 @@ public class NeuronNetworkImpl implements NeuronNetwork {
 
             if (fullEuclidError < currentMinEuclidError) {
                 currentMinEuclidError = fullEuclidError;
+                if (debugLevel.isLessThanOrEqual(DebugLevels.INFO)) {
+                    COMMON_LOGGER.debug("New minimum has been reached: " + currentMinEuclidError);
+                }
+                System.out.println("New minimum has been reached: " + currentMinEuclidError);
             }
 
             if (debugLevel.doOut(epochNumber)) {
@@ -72,12 +78,18 @@ public class NeuronNetworkImpl implements NeuronNetwork {
 
 
             if (debugLevel.isLessThanOrEqual(DebugLevels.INFO)) {
+                boolean isDecent = fullEuclidError <= currentMinEuclidError;
                 String message = "| Epoch: " + epochNumber +
                         "; full relative error: " + fullRelativeError +
                         "; current error: " + fullEuclidError +
                         "; min error: " + currentMinEuclidError +
-                        "; TREND: " + (fullEuclidError > currentMinEuclidError ? "!!!ascent!!!" : "decent");
+                        "; TREND: " + (isDecent ? "decent" : "!!!ascent!!!");
                 COMMON_LOGGER.debug(message);
+
+                if (wasDecent != isDecent) {
+                    wasDecent = isDecent;
+                    System.out.println(isDecent ? "decent" : "!!!ascent!!!");
+                }
             }
 
             epochNumber++;

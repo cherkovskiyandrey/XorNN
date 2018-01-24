@@ -4,23 +4,23 @@ import com.cherkovskiy.neuronNetworks.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.OutputStream;
+
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
 
-public class NeuronNetworkImpl implements NeuronNetwork {
+public class BackPropagationLearnEngineImpl implements BackPropagationLearnEngine {
     private static final Logger COMMON_LOGGER = LoggerFactory.getLogger("CommonLogger");
     private static final Logger ERROR_FUNCTION_LOGGER = LoggerFactory.getLogger("ErrorFunctionLogger");
 
-    private final NeuronNetworkDomain nn;
+    private final FeedforwardNeuronNetworkImpl nn;
     private final double learnRate;
     private final Optional<StatisticsProvider> statisticsProvider;
     private final double weightDecay;
     private DebugLevels debugLevel = DebugLevels.ERROR;
     private int logErrorFunction = -1;
 
-    NeuronNetworkImpl(NeuronNetworkDomain neuronNetworkDomain, double learningRate, double weightDecay, StatisticsProvider statisticsProvider) {
+    BackPropagationLearnEngineImpl(FeedforwardNeuronNetworkImpl neuronNetworkDomain, double learningRate, double weightDecay, StatisticsProvider statisticsProvider) {
         this.nn = neuronNetworkDomain;
         this.statisticsProvider = Optional.ofNullable(statisticsProvider);
         this.learnRate = learningRate;
@@ -30,17 +30,7 @@ public class NeuronNetworkImpl implements NeuronNetwork {
     }
 
     @Override
-    public NeuronNetworkOutput process(NeuronNetworkInput input) {
-        return NeuronNetworkCoreHelper.process(input, nn);
-    }
-
-    @Override
-    public void writeAsXml(OutputStream to) {
-        throw new UnsupportedOperationException("Method has not been supported yet.");
-    }
-
-    @Override
-    public void learnBackProp(NeuronNetworkTrainSets neuronNetworkTrainSet) {
+    public void learnBackProp(NeuronNetworkDataSet neuronNetworkTrainSet) {
         NeuronNetworkCoreHelper.checkCompatible(neuronNetworkTrainSet, nn);
 
         double currentMinEuclidError = Double.MAX_VALUE;
@@ -52,7 +42,7 @@ public class NeuronNetworkImpl implements NeuronNetwork {
             double fullEuclidError = 0d;
 
             statisticsProvider.ifPresent(p -> p.topologySnapshort(nn));
-            for (NeuronNetworkTrainSets.TrainSet trainSet : neuronNetworkTrainSet) {
+            for (NeuronNetworkDataSet.TrainSet trainSet : neuronNetworkTrainSet) {
                 fullEuclidError += doLearnEachPattern(trainSet, epochNumber);
             }
             fullEuclidError /= 2;
@@ -95,7 +85,7 @@ public class NeuronNetworkImpl implements NeuronNetwork {
         }
 
 //        if (debugLevel.isLessThanOrEqualTo(DebugLevels.OFF)) {
-//            for (NeuronNetworkTrainSets.TrainSet trainSet : neuronNetworkTrainSet) {
+//            for (NeuronNetworkDataSet.TrainSet trainSet : neuronNetworkTrainSet) {
 //                final NeuronNetworkOutput neuronNetworkOutput = process(trainSet.getInput());
 //                logAllNets(neuronNetworkOutput);
 //            }
@@ -103,23 +93,25 @@ public class NeuronNetworkImpl implements NeuronNetwork {
 //        }
     }
 
-    @Override
-    public void setDebugMode(DebugLevels debugLevel) {
-        this.debugLevel = debugLevel;
-    }
+
+    //todo: move to BackPropagationLearnEngineBuilderImpl
+//    @Override
+//    public void setDebugMode(DebugLevels debugLevel) {
+//        this.debugLevel = debugLevel;
+//    }
+//
+//    @Override
+//    public void logErrorFunction(int everyCycles) {
+//        this.logErrorFunction = everyCycles;
+//    }
 
     @Override
-    public void learnResilientProp(NeuronNetworkTrainSets neuronNetworkTrainSet) {
-        throw new UnsupportedOperationException("Is not implemented yet.");
-    }
-
-    @Override
-    public void logErrorFunction(int everyCycles) {
-        this.logErrorFunction = everyCycles;
+    public BackPropagationLearnResult learn(NeuronNetwork neuronNetwork, NeuronNetworkDataSet neuronNetworkTrainSet) {
+        //todo
     }
 
     //without recursion
-    private Double doLearnEachPattern(NeuronNetworkTrainSets.TrainSet trainSet, long epochNumber) {
+    private Double doLearnEachPattern(NeuronNetworkDataSet.TrainSet trainSet, long epochNumber) {
         final NeuronNetworkOutput neuronNetworkOutput = process(trainSet.getInput());
 
         final List<Double> currentOutput = neuronNetworkOutput.getOutput();
@@ -165,11 +157,5 @@ public class NeuronNetworkImpl implements NeuronNetwork {
         COMMON_LOGGER.debug(outStr.toString());
     }
 
-    @Override
-    public String toString() {
-        //TODO
-        return "NeuronNetworkImpl{" +
-                "NeuronNetworkDomain=" + nn.toString() +
-                '}';
-    }
+
 }

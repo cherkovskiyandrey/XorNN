@@ -12,7 +12,7 @@ public class NeuronNetworkInputBuilderImpl implements NeuronNetworkInputBuilder 
     private List<Double> inputs = new ArrayList<>();
 
     @Override
-    public NeuronNetworkInputBuilder setInputValues(Collection<? extends Double> inputs) {
+    public NeuronNetworkInputBuilder setInputValues(Collection<Double> inputs) {
         this.inputs.clear();
         this.inputs.addAll(inputs);
         return this;

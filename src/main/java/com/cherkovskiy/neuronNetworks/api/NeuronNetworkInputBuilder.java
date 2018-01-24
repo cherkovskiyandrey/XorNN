@@ -4,7 +4,7 @@ import java.util.Collection;
 
 public interface NeuronNetworkInputBuilder {
 
-    NeuronNetworkInputBuilder setInputValues(Collection<? extends Double> inputs);
+    NeuronNetworkInputBuilder setInputValues(Collection<Double> inputs);
 
     NeuronNetworkInput build();
 }

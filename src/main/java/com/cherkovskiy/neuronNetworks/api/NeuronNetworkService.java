@@ -12,13 +12,19 @@ public interface NeuronNetworkService {
     }
 
     @Nonnull
-    NeuronNetworkBuilder createBuilder();
+    NeuronNetworkBuilder createFeedforwardBuilder();
+
+    @Nonnull
+    BackPropagationLearnEngineBuilder createBackPropagationLearnEngineBuilder();
+
+    @Nonnull
+    ResilientBackPropagationLearnEngineBuilder createResilientBackPropagationLearnEngineBuilder();
 
     @Nonnull
     NeuronNetworkInputBuilder createInputBuilder();
 
     @Nonnull
-    NeuronNetworkTrainSetBuilder createTrainSetBuilder();
+    NeuronNetworkDataSetBuilder createTrainSetBuilder();
 
     @Nonnull
     NeuronNetworkOutputBuilder createOutputBuilder();

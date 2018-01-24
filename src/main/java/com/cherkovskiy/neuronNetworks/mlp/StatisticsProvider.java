@@ -1,7 +1,7 @@
 package com.cherkovskiy.neuronNetworks.mlp;
 
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkOutput;
-import com.cherkovskiy.neuronNetworks.api.NeuronNetworkTrainSets;
+import com.cherkovskiy.neuronNetworks.api.NeuronNetworkDataSet;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.Range;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ class StatisticsProvider {
 
     private final double delta;
     private final double range;
-    private NeuronNetworkDomain begin;
+    private FeedforwardNeuronNetworkImpl begin;
 
     //TODO: to detect change direction!
 
@@ -27,11 +27,11 @@ class StatisticsProvider {
         this.range = range;
     }
 
-    public void topologySnapshort(NeuronNetworkDomain nn) {
+    public void topologySnapshort(FeedforwardNeuronNetworkImpl nn) {
         begin = nn.newClone();
     }
 
-    public void buildRatesDependencies(NeuronNetworkDomain topology, NeuronNetworkTrainSets neuronNetworkTrainSet, long epochNumber) {
+    public void buildRatesDependencies(FeedforwardNeuronNetworkImpl topology, NeuronNetworkDataSet neuronNetworkTrainSet, long epochNumber) {
         NeuronNetworkCoreHelper.checkCompatible(begin, topology);
 
         STAT_LOGGER.info(String.format("============= STAT for %d =============", epochNumber));
@@ -53,7 +53,7 @@ class StatisticsProvider {
 
                     //by scan range
                     final List<Pair<Double, Double>> errorDep = new ArrayList<>();
-                    final NeuronNetworkDomain tmpTopology = begin.newClone();
+                    final FeedforwardNeuronNetworkImpl tmpTopology = begin.newClone();
                     final SortedSet<Double> points = Sets.newTreeSet();
                     for (double k = beginRange; k < endRange; k += delta) {
                         points.add(k);
@@ -66,7 +66,7 @@ class StatisticsProvider {
 
                         // calc full ERROR
                         double error = 0;
-                        for (NeuronNetworkTrainSets.TrainSet trainSet : neuronNetworkTrainSet) {
+                        for (NeuronNetworkDataSet.TrainSet trainSet : neuronNetworkTrainSet) {
                             final NeuronNetworkOutput neuronNetworkOutput = NeuronNetworkCoreHelper.process(trainSet.getInput(), tmpTopology);
                             final List<Double> currentOutput = neuronNetworkOutput.getOutput();
                             final List<Double> teachOutput = trainSet.getOutput().getOutput();

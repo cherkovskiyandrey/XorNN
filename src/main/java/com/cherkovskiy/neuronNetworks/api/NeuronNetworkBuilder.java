@@ -4,8 +4,6 @@ import java.io.InputStream;
 
 public interface NeuronNetworkBuilder {
 
-    NeuronNetworkBuilder setType(NeuronNetworkType type);
-
     NeuronNetworkBuilder inputsNeurons(int amount);
 
     NeuronNetworkBuilder addHiddenLevel(int amount);
@@ -15,12 +13,6 @@ public interface NeuronNetworkBuilder {
     NeuronNetworkBuilder useBias(boolean b);
 
     NeuronNetworkBuilder setActivationFunction(ActivationFunction activationFunction);
-
-    NeuronNetworkBuilder useStatModule(boolean b, double range, double step);
-
-    NeuronNetworkBuilder learningRate(double v);
-
-    NeuronNetworkBuilder weightDecay(double b);
 
     /**
      * Build {@link NeuronNetwork} from options.
@@ -33,8 +25,8 @@ public interface NeuronNetworkBuilder {
      * Build {@link NeuronNetwork} from xml file.
      * Options are ignored.
      *
-     * @param fromXml
+     * @param fromXls
      * @return
      */
-    NeuronNetwork build(InputStream fromXml);
+    NeuronNetwork build(InputStream fromXls);
 }

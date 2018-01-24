@@ -3,7 +3,6 @@ package com.cherkovskiy.neuronNetworks.mlp;
 import com.cherkovskiy.neuronNetworks.api.ActivationFunction;
 import com.cherkovskiy.neuronNetworks.api.NeuronNetwork;
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkBuilder;
-import com.cherkovskiy.neuronNetworks.api.NeuronNetworkType;
 
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -11,23 +10,20 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
-    private NeuronNetworkType type;
+public class FeedforwardNeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
     private ActivationFunction activationFunction;
     private int input;
     private LinkedList<Integer> hiddenLevels = new LinkedList<>();
     private int output;
-    private boolean useStatModule;
-    private double range;
-    private double step;
-    private double weightDecay = Double.NaN;
-    private double learningRate =  0.01;  //according to 92 page: 0.01 ≤ η ≤ 0.9;
 
-    public NeuronNetworkBuilder setType(NeuronNetworkType type) {
-        this.type = type;
-        return this;
-    }
+    //TODO: move to LearnBuilder
+//    private boolean useStatModule;
+//    private double range;
+//    private double step;
+//    private double weightDecay = Double.NaN;
+//    private double learningRate = 0.01;  //according to 92 page: 0.01 ≤ η ≤ 0.9;
 
+    @Override
     public NeuronNetworkBuilder inputsNeurons(int amount) {
         if (amount < 1) {
             throw new IllegalArgumentException(String.format("Amount of inputs neurons must be at least one: %d", amount));
@@ -36,6 +32,7 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
         return this;
     }
 
+    @Override
     public NeuronNetworkBuilder addHiddenLevel(int amount) {
         if (amount < 1) {
             throw new IllegalArgumentException("Level can`t be empty");
@@ -44,6 +41,7 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
         return this;
     }
 
+    @Override
     public NeuronNetworkBuilder outputNeurons(int amount) {
         if (amount < 1) {
             throw new IllegalArgumentException(String.format("Amount of outputs neurons must be at least one: %d", amount));
@@ -52,6 +50,7 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
         return this;
     }
 
+    @Override
     public NeuronNetworkBuilder useBias(boolean b) {
         return this;
     }
@@ -62,25 +61,26 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
         return this;
     }
 
-    @Override
-    public NeuronNetworkBuilder useStatModule(boolean b, double range, double step) {
-        this.useStatModule = b;
-        this.range = range;
-        this.step = step;
-        return this;
-    }
-
-    @Override
-    public NeuronNetworkBuilder learningRate(double learningRate) {
-        this.learningRate = learningRate;
-        return this;
-    }
-
-    @Override
-    public NeuronNetworkBuilder weightDecay(double b) {
-        this.weightDecay = b;
-        return this;
-    }
+    //TODO: move to LearnBuilder
+//    @Override
+//    public NeuronNetworkBuilder useStatModule(boolean b, double range, double step) {
+//        this.useStatModule = b;
+//        this.range = range;
+//        this.step = step;
+//        return this;
+//    }
+//
+//    @Override
+//    public NeuronNetworkBuilder learningRate(double learningRate) {
+//        this.learningRate = learningRate;
+//        return this;
+//    }
+//
+//    @Override
+//    public NeuronNetworkBuilder weightDecay(double b) {
+//        this.weightDecay = b;
+//        return this;
+//    }
 
     public NeuronNetwork build() {
         int allNeurons = input + hiddenLevels.stream().mapToInt(Integer::intValue).sum() + output;
@@ -98,12 +98,7 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
             levelEnd = levelEnd + levelAmount;
         }
 
-        return new NeuronNetworkImpl(
-                new NeuronNetworkDomain(input, topology, output, activationFunction),
-                learningRate,
-                weightDecay,
-                useStatModule ? new StatisticsProvider(range, step) : null
-        );
+        return new FeedforwardNeuronNetworkImpl(input, topology, output, activationFunction);
     }
 
     @Override

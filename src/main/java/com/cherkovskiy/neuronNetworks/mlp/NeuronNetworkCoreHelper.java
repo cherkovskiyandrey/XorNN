@@ -1,55 +1,30 @@
 package com.cherkovskiy.neuronNetworks.mlp;
 
-import com.cherkovskiy.neuronNetworks.api.NeuronNetworkInput;
+import com.cherkovskiy.neuronNetworks.api.NeuronNetworkDataSet;
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkOutput;
-import com.cherkovskiy.neuronNetworks.api.NeuronNetworkTrainSets;
 
 import java.util.*;
 
 class NeuronNetworkCoreHelper {
 
-    static NeuronNetworkOutput process(NeuronNetworkInput input, NeuronNetworkDomain nn) {
-        if (input.size() != nn.getInputAmount()) {
-            throw new IllegalArgumentException(String.format("Incompatible input: size of input array is %d != %d NeuronNetworkImpl amount of input neurons", input.size(), nn.getInputAmount()));
-        }
-        final List<Double> inputVector = new LinkedList<>();
-        inputVector.addAll(input.getInput());
 
-        final List<Double> outputVector = new LinkedList<>();
-        outputVector.addAll(input.getInput());
-
-        for (int i = input.getInput().size(); i < nn.getTopology().length; ++i) {
-            double sum = 0;
-            for (int j = 0; j < nn.getTopology()[i].length; ++j) {
-                final double rate = nn.getTopology()[i][j];
-                if (!Double.isNaN(rate)) {
-                    sum += outputVector.get(j) * rate;
-                }
-            }
-            inputVector.add(sum);
-            outputVector.add(nn.getActivationFunction().activate(sum));
-        }
-
-        return new NeuronNetworkOutputImpl(inputVector, nn.getInputAmount(), outputVector, nn.getOutputAmount());
-    }
-
-    public static void checkCompatible(NeuronNetworkTrainSets neuronNetworkTrainSet, NeuronNetworkDomain nn) {
+    public static void checkCompatible(NeuronNetworkDataSet neuronNetworkTrainSet, FeedforwardNeuronNetworkImpl nn) {
         neuronNetworkTrainSet.forEach(trainSet -> {
             if (trainSet.getInput().size() != nn.getInputAmount()) {
                 throw new IllegalArgumentException(String.format(
-                        "Incompatible input: size of input array is %d != %d NeuronNetworkImpl amount of input neurons",
+                        "Incompatible input: size of input array is %d != %d BackPropagationLearnEngineImpl amount of input neurons",
                         trainSet.getInput().size(), nn.getInputAmount()));
             }
 
             if (trainSet.getOutput().getOutput().size() != nn.getOutputAmount()) {
                 throw new IllegalArgumentException(String.format(
-                        "Incompatible output: size of output array is %d != %d NeuronNetworkImpl amount of output neurons",
+                        "Incompatible output: size of output array is %d != %d BackPropagationLearnEngineImpl amount of output neurons",
                         trainSet.getOutput().getOutput().size(), nn.getOutputAmount()));
             }
         });
     }
 
-    public static void checkCompatible(NeuronNetworkDomain nn1, NeuronNetworkDomain nn2) {
+    public static void checkCompatible(FeedforwardNeuronNetworkImpl nn1, FeedforwardNeuronNetworkImpl nn2) {
         //todo
     }
 
@@ -66,7 +41,7 @@ class NeuronNetworkCoreHelper {
                                                          NeuronNetworkOutput neuronNetworkOutput,
                                                          double learnRate,
                                                          double weightDecay,
-                                                         NeuronNetworkDomain nn) {
+                                                         FeedforwardNeuronNetworkImpl nn) {
 
         final List<Double> currentAllInputs = neuronNetworkOutput.getInputsAllNeurons();
         final List<Double> currentAllOutputs = neuronNetworkOutput.getOutputAllNeurons();
@@ -121,7 +96,7 @@ class NeuronNetworkCoreHelper {
      * @param deltaRates
      * @param nn
      */
-    public static void applyDeltaRates(Queue<Double> deltaRates, NeuronNetworkDomain nn) {
+    public static void applyDeltaRates(Queue<Double> deltaRates, FeedforwardNeuronNetworkImpl nn) {
         for (int currentNeuronIndex = nn.getTopology().length - 1; currentNeuronIndex >= nn.getInputAmount(); currentNeuronIndex--) {
 
             final double[] currentNeuronLinks = nn.getTopology()[currentNeuronIndex];
@@ -170,7 +145,7 @@ class NeuronNetworkCoreHelper {
         return result;
     }
 
-    private static List<Integer> getUpStream(int currentNeuronIndex, NeuronNetworkDomain nn) {
+    private static List<Integer> getUpStream(int currentNeuronIndex, FeedforwardNeuronNetworkImpl nn) {
         final List<Integer> result = new ArrayList<>();
         for (int i = currentNeuronIndex + 1; i < nn.getTopology().length; ++i) {
             Double rate = nn.getTopology()[i][currentNeuronIndex];

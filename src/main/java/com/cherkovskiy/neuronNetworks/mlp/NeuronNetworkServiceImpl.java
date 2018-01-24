@@ -6,10 +6,22 @@ import javax.annotation.Nonnull;
 
 public class NeuronNetworkServiceImpl implements NeuronNetworkService {
 
-    @Override
     @Nonnull
-    public NeuronNetworkBuilder createBuilder() {
-        return new NeuronNetworkBuilderImpl();
+    @Override
+    public NeuronNetworkBuilder createFeedforwardBuilder() {
+        return new FeedforwardNeuronNetworkBuilderImpl();
+    }
+
+    @Nonnull
+    @Override
+    public BackPropagationLearnEngineBuilder createBackPropagationLearnEngineBuilder() {
+        //todo
+    }
+
+    @Nonnull
+    @Override
+    public ResilientBackPropagationLearnEngineBuilder createResilientBackPropagationLearnEngineBuilder() {
+        //todo
     }
 
     @Override
@@ -20,7 +32,7 @@ public class NeuronNetworkServiceImpl implements NeuronNetworkService {
 
     @Nonnull
     @Override
-    public NeuronNetworkTrainSetBuilder createTrainSetBuilder() {
+    public NeuronNetworkDataSetBuilder createTrainSetBuilder() {
         return new NeuronNetworkTrainSetBuilderImpl();
     }
 

@@ -2,13 +2,13 @@ package com.cherkovskiy.neuronNetworks.mlp;
 
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkInput;
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkOutput;
-import com.cherkovskiy.neuronNetworks.api.NeuronNetworkTrainSets;
+import com.cherkovskiy.neuronNetworks.api.NeuronNetworkDataSet;
 
 import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.List;
 
-class NeuronNetworkTrainSetInMemoryImpl implements NeuronNetworkTrainSets {
+class NeuronNetworkTrainSetInMemoryImpl implements NeuronNetworkDataSet {
     private final List<Pair<NeuronNetworkInput, NeuronNetworkOutput>> trainInput; //TODO: get rid of Pair and use TrainSet implementation
 
     NeuronNetworkTrainSetInMemoryImpl(List<Pair<NeuronNetworkInput, NeuronNetworkOutput>> trainInput) {
@@ -45,8 +45,4 @@ class NeuronNetworkTrainSetInMemoryImpl implements NeuronNetworkTrainSets {
         };
     }
 
-    @Override
-    public long getSize() {
-        return trainInput.size();
-    }
 }

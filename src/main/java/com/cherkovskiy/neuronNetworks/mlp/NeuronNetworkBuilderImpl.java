@@ -17,10 +17,11 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
     private int input;
     private LinkedList<Integer> hiddenLevels = new LinkedList<>();
     private int output;
-    private float stopRelativeError;
     private boolean useStatModule;
     private double range;
     private double step;
+    private double weightDecay = Double.NaN;
+    private double learningRate =  0.01;  //according to 92 page: 0.01 ≤ η ≤ 0.9;
 
     public NeuronNetworkBuilder setType(NeuronNetworkType type) {
         this.type = type;
@@ -62,12 +63,6 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
     }
 
     @Override
-    public NeuronNetworkBuilder setStopRelativeError(float percentInEachOut) {
-        this.stopRelativeError = percentInEachOut;
-        return this;
-    }
-
-    @Override
     public NeuronNetworkBuilder useStatModule(boolean b, double range, double step) {
         this.useStatModule = b;
         this.range = range;
@@ -75,6 +70,17 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
         return this;
     }
 
+    @Override
+    public NeuronNetworkBuilder learningRate(double learningRate) {
+        this.learningRate = learningRate;
+        return this;
+    }
+
+    @Override
+    public NeuronNetworkBuilder weightDecay(double b) {
+        this.weightDecay = b;
+        return this;
+    }
 
     public NeuronNetwork build() {
         int allNeurons = input + hiddenLevels.stream().mapToInt(Integer::intValue).sum() + output;
@@ -94,9 +100,10 @@ public class NeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
 
         return new NeuronNetworkImpl(
                 new NeuronNetworkDomain(input, topology, output, activationFunction),
-                stopRelativeError,
+                learningRate,
+                weightDecay,
                 useStatModule ? new StatisticsProvider(range, step) : null
-                );
+        );
     }
 
     @Override

@@ -21,8 +21,8 @@ class NeuronNetworkCoreHelper {
         for (int i = input.getInput().size(); i < nn.getTopology().length; ++i) {
             double sum = 0;
             for (int j = 0; j < nn.getTopology()[i].length; ++j) {
-                final Double rate = nn.getTopology()[i][j];
-                if (!rate.isNaN()) {
+                final double rate = nn.getTopology()[i][j];
+                if (!Double.isNaN(rate)) {
                     sum += outputVector.get(j) * rate;
                 }
             }
@@ -58,12 +58,14 @@ class NeuronNetworkCoreHelper {
      * @param teachOutput
      * @param neuronNetworkOutput
      * @param learnRate
+     * @param weightDecay
      * @param nn
-     * @return delta rates of weight for certain one pattern form end of topology
+     * @return
      */
     public static ArrayDeque<Double> quickBpLearnPattern(List<Double> teachOutput,
                                                          NeuronNetworkOutput neuronNetworkOutput,
                                                          double learnRate,
+                                                         double weightDecay,
                                                          NeuronNetworkDomain nn) {
 
         final List<Double> currentAllInputs = neuronNetworkOutput.getInputsAllNeurons();
@@ -96,9 +98,14 @@ class NeuronNetworkCoreHelper {
             }
 
             for (int linkedNeuronIndex = currentNeuronLinks.length - 1; linkedNeuronIndex != 0; linkedNeuronIndex--) {
-                final Double rate = currentNeuronLinks[linkedNeuronIndex];
-                if (!rate.isNaN()) {
+                final double rate = currentNeuronLinks[linkedNeuronIndex];
+                if (!Double.isNaN(rate)) {
                     double deltaRate = learnRate * currentAllOutputs.get(linkedNeuronIndex) * dArray[currentNeuronIndex];
+
+                    if (!Double.isNaN(weightDecay)) {
+                        deltaRate -= learnRate * weightDecay * rate;
+                    }
+
                     deltaRates.add(deltaRate);
                 }
             }
@@ -115,15 +122,12 @@ class NeuronNetworkCoreHelper {
      * @param nn
      */
     public static void applyDeltaRates(Queue<Double> deltaRates, NeuronNetworkDomain nn) {
-        for (int currentNeuronIndex = nn.getTopology().length - 1, outputCounter = nn.getOutputAmount();
-             currentNeuronIndex >= nn.getInputAmount();
-             currentNeuronIndex--, outputCounter--) {
+        for (int currentNeuronIndex = nn.getTopology().length - 1; currentNeuronIndex >= nn.getInputAmount(); currentNeuronIndex--) {
 
             final double[] currentNeuronLinks = nn.getTopology()[currentNeuronIndex];
-
             for (int linkedNeuronIndex = currentNeuronLinks.length - 1; linkedNeuronIndex != 0; linkedNeuronIndex--) {
-                final Double rate = currentNeuronLinks[linkedNeuronIndex];
-                if (!rate.isNaN()) {
+                final double rate = currentNeuronLinks[linkedNeuronIndex];
+                if (!Double.isNaN(rate)) {
                     currentNeuronLinks[linkedNeuronIndex] += deltaRates.poll();
                 }
             }
@@ -146,18 +150,24 @@ class NeuronNetworkCoreHelper {
     }
 
     /**
-     * Calc relative error for one case.
+     * Calc error for one case with weight decay.
      *
      * @param teachOutput
      * @param currentOutput
+     * @param topology
+     * @param weightDecay
      * @return
      */
-    public static Double calcRelativeError(List<Double> teachOutput, List<Double> currentOutput, NeuronNetworkDomain nn) {
-        double result = 0d;
-        for (int i = 0; i < teachOutput.size(); ++i) {
-            result += Math.abs(teachOutput.get(i) - currentOutput.get(i)) / nn.getActivationFunction().getRange();
+    public static Double calcEuclideError(List<Double> teachOutput, List<Double> currentOutput, double[][] topology, double weightDecay) {
+        double result = calcEuclideError(teachOutput, currentOutput);
+        for (double[] row : topology) {
+            for (double rate : row) {
+                if (!Double.isNaN(rate)) {
+                    result += weightDecay * Math.pow(rate, 2);
+                }
+            }
         }
-        return result / teachOutput.size();
+        return result;
     }
 
     private static List<Integer> getUpStream(int currentNeuronIndex, NeuronNetworkDomain nn) {

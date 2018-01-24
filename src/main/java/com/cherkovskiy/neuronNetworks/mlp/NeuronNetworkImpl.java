@@ -11,17 +11,20 @@ import java.util.Optional;
 
 public class NeuronNetworkImpl implements NeuronNetwork {
     private static final Logger COMMON_LOGGER = LoggerFactory.getLogger("CommonLogger");
+    private static final Logger ERROR_FUNCTION_LOGGER = LoggerFactory.getLogger("ErrorFunctionLogger");
 
     private final NeuronNetworkDomain nn;
-    private final double learnRate = 0.01; //according to 92 page: 0.01 ≤ η ≤ 0.9
-    private DebugLevels debugLevel = DebugLevels.ERROR;
-    private float stopRelativeError = 0.1f; // not more 10% in each output
+    private final double learnRate;
     private final Optional<StatisticsProvider> statisticsProvider;
+    private final double weightDecay;
+    private DebugLevels debugLevel = DebugLevels.ERROR;
+    private int logErrorFunction = -1;
 
-    NeuronNetworkImpl(NeuronNetworkDomain neuronNetworkDomain, float stopRelativeError, StatisticsProvider statisticsProvider) {
+    NeuronNetworkImpl(NeuronNetworkDomain neuronNetworkDomain, double learningRate, double weightDecay, StatisticsProvider statisticsProvider) {
         this.nn = neuronNetworkDomain;
-        this.stopRelativeError = stopRelativeError;
         this.statisticsProvider = Optional.ofNullable(statisticsProvider);
+        this.learnRate = learningRate;
+        this.weightDecay = weightDecay;
 
         COMMON_LOGGER.debug(this.toString());
     }
@@ -41,46 +44,42 @@ public class NeuronNetworkImpl implements NeuronNetwork {
         NeuronNetworkCoreHelper.checkCompatible(neuronNetworkTrainSet, nn);
 
         double currentMinEuclidError = Double.MAX_VALUE;
-        double fullRelativeError = 100d;
         long epochNumber = 0;
         boolean wasDecent = true;
         System.out.println("decent");
 
-        //while (fullRelativeError > stopRelativeError) { //TODO: см questions.txt "Изменить подход остановки обучения"
-        double fullEuclidError = Double.MAX_VALUE;
-        //while (fullEuclidError > 0.01d) {
         while (true) {
-            fullEuclidError = 0d;
+            double fullEuclidError = 0d;
 
             statisticsProvider.ifPresent(p -> p.topologySnapshort(nn));
             for (NeuronNetworkTrainSets.TrainSet trainSet : neuronNetworkTrainSet) {
-                final Pair<Double, Double> errors = doLearnEachPattern(trainSet, epochNumber);
-                fullEuclidError += errors.getFirst();
-                fullRelativeError += errors.getSecond();
+                fullEuclidError += doLearnEachPattern(trainSet, epochNumber);
             }
             fullEuclidError /= 2;
-            fullRelativeError /= neuronNetworkTrainSet.getSize();
 
             if (fullEuclidError < currentMinEuclidError) {
                 currentMinEuclidError = fullEuclidError;
-                if (debugLevel.isLessThanOrEqual(DebugLevels.INFO)) {
+                if (debugLevel.isLessThanOrEqualTo(DebugLevels.INFO)) {
                     COMMON_LOGGER.debug("New minimum has been reached: " + currentMinEuclidError);
                 }
-                System.out.println("New minimum has been reached: " + currentMinEuclidError);
+                System.out.println(epochNumber + ": New minimum has been reached: " + currentMinEuclidError);
             }
 
             if (debugLevel.doOut(epochNumber)) {
                 COMMON_LOGGER.debug(this.toString());
             }
 
+            if(debugLevel.isLessThanOrEqualTo(DebugLevels.INFO) && logErrorFunction != -1 && (epochNumber % logErrorFunction) == 0) {
+                //TODO: to xls http://poi.apache.org/spreadsheet/quick-guide.html#NewWorkbook
+                ERROR_FUNCTION_LOGGER.info(epochNumber + ";" + fullEuclidError);
+            }
+
             final long finalEpochNumber = epochNumber;
             statisticsProvider.ifPresent(p -> p.buildRatesDependencies(nn, neuronNetworkTrainSet, finalEpochNumber));
 
-
-            if (debugLevel.isLessThanOrEqual(DebugLevels.INFO)) {
+            if (debugLevel.isLessThanOrEqualTo(DebugLevels.INFO)) {
                 boolean isDecent = fullEuclidError <= currentMinEuclidError;
                 String message = "| Epoch: " + epochNumber +
-                        "; full relative error: " + fullRelativeError +
                         "; current error: " + fullEuclidError +
                         "; min error: " + currentMinEuclidError +
                         "; TREND: " + (isDecent ? "decent" : "!!!ascent!!!");
@@ -95,7 +94,7 @@ public class NeuronNetworkImpl implements NeuronNetwork {
             epochNumber++;
         }
 
-//        if (debugLevel.isLessThanOrEqual(DebugLevels.OFF)) {
+//        if (debugLevel.isLessThanOrEqualTo(DebugLevels.OFF)) {
 //            for (NeuronNetworkTrainSets.TrainSet trainSet : neuronNetworkTrainSet) {
 //                final NeuronNetworkOutput neuronNetworkOutput = process(trainSet.getInput());
 //                logAllNets(neuronNetworkOutput);
@@ -114,28 +113,34 @@ public class NeuronNetworkImpl implements NeuronNetwork {
         throw new UnsupportedOperationException("Is not implemented yet.");
     }
 
+    @Override
+    public void logErrorFunction(int everyCycles) {
+        this.logErrorFunction = everyCycles;
+    }
+
     //without recursion
-    private Pair<Double, Double> doLearnEachPattern(NeuronNetworkTrainSets.TrainSet trainSet, long epochNumber) {
+    private Double doLearnEachPattern(NeuronNetworkTrainSets.TrainSet trainSet, long epochNumber) {
         final NeuronNetworkOutput neuronNetworkOutput = process(trainSet.getInput());
 
         final List<Double> currentOutput = neuronNetworkOutput.getOutput();
         final List<Double> teachOutput = trainSet.getOutput().getOutput();
 
-        if (debugLevel.isLessThanOrEqual(DebugLevels.INFO)) {
+        if (debugLevel.isLessThanOrEqualTo(DebugLevels.INFO)) {
             logCurrentOutput(trainSet.getInput(), neuronNetworkOutput);
-            if (debugLevel.isLessThanOrEqual(DebugLevels.DEBUG) || debugLevel.doOut(epochNumber)) {
+            if (debugLevel.isLessThanOrEqualTo(DebugLevels.DEBUG) || debugLevel.doOut(epochNumber)) {
                 logAllNets(neuronNetworkOutput);
             }
         }
 
-        final ArrayDeque<Double> deltaRates = NeuronNetworkCoreHelper.quickBpLearnPattern(teachOutput, neuronNetworkOutput, learnRate, nn);
+        final ArrayDeque<Double> deltaRates = NeuronNetworkCoreHelper.quickBpLearnPattern(teachOutput, neuronNetworkOutput, learnRate, weightDecay, nn);
         NeuronNetworkCoreHelper.applyDeltaRates(deltaRates, nn);
 
-        if (debugLevel.isLessThanOrEqual(DebugLevels.TRACE)) {
+        if (debugLevel.isLessThanOrEqualTo(DebugLevels.TRACE)) {
             COMMON_LOGGER.debug(this.toString());
         }
 
-        return Pair.of(NeuronNetworkCoreHelper.calcEuclideError(teachOutput, currentOutput), NeuronNetworkCoreHelper.calcRelativeError(teachOutput, currentOutput, nn));
+        return Double.isNaN(weightDecay) ? NeuronNetworkCoreHelper.calcEuclideError(teachOutput, currentOutput) :
+                NeuronNetworkCoreHelper.calcEuclideError(teachOutput, currentOutput, nn.getTopology(), weightDecay);
     }
 
 

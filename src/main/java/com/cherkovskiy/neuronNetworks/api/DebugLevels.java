@@ -72,7 +72,7 @@ public enum DebugLevels {
         return level;
     }
 
-    public boolean isLessThanOrEqual(DebugLevels level) {
+    public boolean isLessThanOrEqualTo(DebugLevels level) {
         return this.level <= level.getLevel();
     }
 

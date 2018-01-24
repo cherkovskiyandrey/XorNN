@@ -16,10 +16,11 @@ public interface NeuronNetworkBuilder {
 
     NeuronNetworkBuilder setActivationFunction(ActivationFunction activationFunction);
 
-    NeuronNetworkBuilder setStopRelativeError(float percentInEachOut);
-
-
     NeuronNetworkBuilder useStatModule(boolean b, double range, double step);
+
+    NeuronNetworkBuilder learningRate(double v);
+
+    NeuronNetworkBuilder weightDecay(double b);
 
     /**
      * Build {@link NeuronNetwork} from options.

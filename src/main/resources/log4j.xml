@@ -28,6 +28,15 @@
         </layout>
     </appender>
 
+    <appender name="ErrorFunctionAppender" class="org.apache.log4j.RollingFileAppender">
+        <param name="file" value="logs/error_function.xls" />
+        <param name="maxBackupIndex" value="100" />
+        <param name="maxFileSize" value="100MB" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%m%n" />
+        </layout>
+    </appender>
+
     <appender name="AsyncCommonAppender" class="org.apache.log4j.AsyncAppender">
         <param name="BufferSize" value="1024" />
         <appender-ref ref="CommonAppender" />
@@ -36,6 +45,11 @@
     <appender name="AsyncStatAppender" class="org.apache.log4j.AsyncAppender">
         <param name="BufferSize" value="1024" />
         <appender-ref ref="StatAppender" />
+    </appender>
+
+    <appender name="AsyncErrorFunctionAppender" class="org.apache.log4j.AsyncAppender">
+        <param name="BufferSize" value="1024" />
+        <appender-ref ref="ErrorFunctionAppender" />
     </appender>
 
     <logger name="CommonLogger" additivity="false">
@@ -47,6 +61,12 @@
     <logger name="StatLogger" additivity="false">
         <level value="trace" />
         <appender-ref ref="AsyncStatAppender"/>
+        <!--<appender-ref ref="console" />-->
+    </logger>
+
+    <logger name="ErrorFunctionLogger" additivity="false">
+        <level value="trace" />
+        <appender-ref ref="AsyncErrorFunctionAppender"/>
         <!--<appender-ref ref="console" />-->
     </logger>
 </log4j:configuration>

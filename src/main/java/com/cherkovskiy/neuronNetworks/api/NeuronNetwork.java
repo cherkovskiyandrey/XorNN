@@ -13,4 +13,6 @@ public interface NeuronNetwork {
     void setDebugMode(DebugLevels debugLevel);
 
     void learnResilientProp(NeuronNetworkTrainSets neuronNetworkTrainSet);
+
+    void logErrorFunction(int everyCycles);
 }

@@ -4,6 +4,7 @@ package com.cherkovskiy.neuronNetworks.api;
 import com.cherkovskiy.neuronNetworks.mlp.NeuronNetworkServiceImpl;
 
 import javax.annotation.Nonnull;
+import java.io.InputStream;
 
 public interface NeuronNetworkService {
 
@@ -28,4 +29,7 @@ public interface NeuronNetworkService {
 
     @Nonnull
     NeuronNetworkOutputBuilder createOutputBuilder();
+
+    @Nonnull
+    ActivationFunction deserializeActFuncFrom(InputStream from);
 }

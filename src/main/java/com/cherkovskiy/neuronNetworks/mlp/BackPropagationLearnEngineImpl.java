@@ -4,7 +4,6 @@ import com.cherkovskiy.neuronNetworks.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +37,20 @@ public class BackPropagationLearnEngineImpl implements BackPropagationLearnEngin
         boolean wasDecent = true;
         System.out.println("decent");
 
+        //TODO: online learning may be is:
+//        final double error = 0;
+//        do {
+//            final NeuronNetworkDataSet.TrainSet trainSet = neuronNetworkTrainSet.getNextRandomTrainSet();
+//            error = doLearnEachPattern(trainSet, epochNumber); //TODO: epochNumber - теперь нет такого понятия видимо
+//        } while (isEnoughToLearn(error, epochNumber)); //TODO: all factors
+
+//        //TODO: or offline learning with minibatch
+//        final double error = 0;
+//        do {
+//            final List<NeuronNetworkDataSet.TrainSet> batch = neuronNetworkTrainSet.getNextRandomTrainBatch(1024);
+//            error = doLearnBatch(batch, epochNumber);
+//        } while (isEnoughToLearn(error, epochNumber)); //TODO: all factors
+
         while (true) {
             double fullEuclidError = 0d;
 
@@ -59,7 +72,7 @@ public class BackPropagationLearnEngineImpl implements BackPropagationLearnEngin
                 COMMON_LOGGER.debug(this.toString());
             }
 
-            if(debugLevel.isLessThanOrEqualTo(DebugLevels.INFO) && logErrorFunction != -1 && (epochNumber % logErrorFunction) == 0) {
+            if (debugLevel.isLessThanOrEqualTo(DebugLevels.INFO) && logErrorFunction != -1 && (epochNumber % logErrorFunction) == 0) {
                 //TODO: to xls http://poi.apache.org/spreadsheet/quick-guide.html#NewWorkbook
                 ERROR_FUNCTION_LOGGER.info(epochNumber + ";" + fullEuclidError);
             }
@@ -106,7 +119,12 @@ public class BackPropagationLearnEngineImpl implements BackPropagationLearnEngin
 //    }
 
     @Override
-    public BackPropagationLearnResult learn(NeuronNetwork neuronNetwork, NeuronNetworkDataSet neuronNetworkTrainSet) {
+    public BackPropagationLearnResult onlineLearn(NeuronNetwork neuronNetwork, NeuronNetworkDataSet neuronNetworkTrainSet) {
+        //todo
+    }
+
+    @Override
+    public BackPropagationLearnResult estimate(NeuronNetwork neuronNetworkFromFile, NeuronNetworkDataSet neuronNetworkTrainSet) {
         //todo
     }
 

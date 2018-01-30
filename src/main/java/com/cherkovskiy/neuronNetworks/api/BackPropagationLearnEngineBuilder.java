@@ -1,6 +1,6 @@
 package com.cherkovskiy.neuronNetworks.api;
 
-public interface BackPropagationLearnEngineBuilder extends LearnEngineBuilderBase {
+public interface BackPropagationLearnEngineBuilder extends LearnEngineBuilderBase<BackPropagationLearnEngineBuilder> {
 
     BackPropagationLearnEngineBuilder learningRate(double rate);
 

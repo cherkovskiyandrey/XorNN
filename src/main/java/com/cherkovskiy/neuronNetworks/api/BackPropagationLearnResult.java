@@ -3,6 +3,7 @@ package com.cherkovskiy.neuronNetworks.api;
 import java.util.List;
 import java.util.Optional;
 
+
 public interface BackPropagationLearnResult {
 
     interface Result {

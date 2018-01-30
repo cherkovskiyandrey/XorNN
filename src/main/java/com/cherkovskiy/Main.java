@@ -27,16 +27,24 @@ public class Main {
                 .build();
 
 
-        // 2. Create learn builder for NN
+        // 2. Create onlineLearn builder for NN
         final BackPropagationLearnEngine backPropagationLearnEngine = neuronNetworkService.createBackPropagationLearnEngineBuilder()
                 .learningRate(0.01)      //according to 92 page: 0.01 ≤ η ≤ 0.9
-                .weightDecay(0.00001)    //try to avoid large weights //5.6.4 Weight decay: Punishment of large weights
+                .weightDecay(0.00001)    //try to avoid large weights //5.6.4 Weight decay: Punishment of large weights - improve generalization and reduce memorization.
 
                 .setSuccessErrorValue(0.001)
                 .setStopCondition(10000, 0.001)
                 .setMaxEpochPerCycle(2000000)
+
+
+                //Think about necessity of this approach - it is not optimal and more time consuming.
+                //Instead I propose to consider: dropout
+                // http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.50.4167&rep=rep1&type=pdf
+                // http://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf
+                // Also I can try to implement http://yann.lecun.com/exdb/publis/pdf/lecun-90b.pdf - Pruning and Optimal Brain Damage
+                .expand(true)
                 .setMinNeuronsPerLevel(3)
-                .setMaxNeuronsPerLevel(20)
+                .setMaxNeuronsPerLevel(3000)
                 .setMinLevels(1)
                 .setMaxLevels(10)
 
@@ -83,6 +91,7 @@ public class Main {
 //                .setTrainInputAndOutput(inputBuilder.setInputValues(Arrays.asList(1d, 1d, 1d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d)).build())
 
 
+                //TODO: програмно создать сет для 64 бит например
                 //set train data
                 .setTrainInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 0d, 0d, 0d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d)).build())
                 .setTrainInputAndOutput(inputBuilder.setInputValues(Arrays.asList(0d, 0d, 0d, 1d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d)).build())
@@ -101,7 +110,6 @@ public class Main {
                 .setTrainInputAndOutput(inputBuilder.setInputValues(Arrays.asList(1d, 1d, 1d, 0d)).build(), outputBuilder.setOutputValues(Arrays.asList(1d)).build())
                 .setTrainInputAndOutput(inputBuilder.setInputValues(Arrays.asList(1d, 1d, 1d, 1d)).build(), outputBuilder.setOutputValues(Arrays.asList(0d)).build())
 
-
                 .useToVerify(0.01f)
 
                 .build();
@@ -115,12 +123,12 @@ public class Main {
 
 
         //4. Learn process
-        final BackPropagationLearnResult backPropagationLearnResult = backPropagationLearnEngine.learn(neuronNetwork, neuronNetworkTrainSet);
+        final BackPropagationLearnResult backPropagationLearnResult = backPropagationLearnEngine.onlineLearn(neuronNetwork, neuronNetworkTrainSet);
         System.out.println(backPropagationLearnResult);
 
         //5. Serialize new NN
         try (OutputStream outputStream = Files.newOutputStream(Paths.get("neuronNetwork.nn"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
-            backPropagationLearnResult.getResultForTrainSet().getTopologyBestError().writeToXls(outputStream);
+            backPropagationLearnResult.getResultForTrainSet().getTopologyBestError().writeTo(outputStream);
         }
 
         //------------- Extra abilities ---------------------

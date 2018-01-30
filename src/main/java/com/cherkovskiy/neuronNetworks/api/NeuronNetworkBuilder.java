@@ -1,5 +1,6 @@
 package com.cherkovskiy.neuronNetworks.api;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 public interface NeuronNetworkBuilder {
@@ -25,8 +26,8 @@ public interface NeuronNetworkBuilder {
      * Build {@link NeuronNetwork} from xml file.
      * Options are ignored.
      *
-     * @param fromXls
+     * @param from
      * @return
      */
-    NeuronNetwork build(InputStream fromXls);
+    NeuronNetwork build(InputStream from) throws IOException, ClassNotFoundException;
 }

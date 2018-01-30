@@ -5,11 +5,17 @@ import com.cherkovskiy.neuronNetworks.api.NeuronNetwork;
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkInput;
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkOutput;
 
-import java.io.OutputStream;
+import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 
 class FeedforwardNeuronNetworkImpl implements NeuronNetwork, Cloneable {
+    public final static String TYPE = "FEED_FORWARD";
+    public static String UUID = "27b4fe1c-9390-47e3-8eb2-155c8fc138f1";
+
     private final ActivationFunction activationFunction;
     private final int inputAmount;
     private double[][] topology;
@@ -83,8 +89,37 @@ class FeedforwardNeuronNetworkImpl implements NeuronNetwork, Cloneable {
     }
 
     @Override
-    public void writeToXls(OutputStream to) {
-        //todo
+    public void writeTo(OutputStream to) throws IOException {
+        final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(to, StandardCharsets.UTF_8));
+        try {
+            writer.write(TYPE);
+            writer.write("\n");
+            writer.write(UUID);
+            writer.write("\n");
+
+            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+                try (OutputStream outputStream = Base64.getEncoder().wrap(byteArrayOutputStream)) {
+                    activationFunction.serializeTo(outputStream);
+                }
+                writer.write(byteArrayOutputStream.toString(StandardCharsets.UTF_8.name()));
+                writer.write("\n");
+            }
+
+            writer.write(Integer.toString(inputAmount));
+            writer.write("\n");
+            writer.write(Integer.toString(outputAmount));
+            writer.write("\n");
+            writer.write(Integer.toString(topology.length));
+            writer.write("\n");
+            for (double[] level : topology) {
+                for (int j = 0; j < level.length; j++) {
+                    writer.write(j + ":" + level[j] + ";");
+                }
+                writer.write("\n");
+            }
+        } finally {
+            writer.flush();
+        }
     }
 
     @Override

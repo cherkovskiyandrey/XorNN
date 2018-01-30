@@ -2,7 +2,10 @@ package com.cherkovskiy.neuronNetworks.api;
 
 public interface BackPropagationLearnEngine {
 
-    BackPropagationLearnResult learn(NeuronNetwork neuronNetwork, NeuronNetworkDataSet neuronNetworkTrainSet);
+    BackPropagationLearnResult onlineLearn(NeuronNetwork neuronNetwork, NeuronNetworkDataSet neuronNetworkTrainSet);
+
+
+    BackPropagationLearnResult batchLearn(NeuronNetwork neuronNetwork, NeuronNetworkDataSet neuronNetworkTrainSet);
 
     /**
      * Estimate NN is it appropriate to current dataset.

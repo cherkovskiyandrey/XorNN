@@ -1,16 +1,16 @@
 package com.cherkovskiy.neuronNetworks.api;
 
-public interface LearnEngineBuilderBase {
+public interface LearnEngineBuilderBase<T extends LearnEngineBuilderBase> {
 
     /**
-     * If error function does not change greater than maxErrorFluctuation in last epochAmount epoch, learn will stop.
+     * If error function does not change greater than maxErrorFluctuation in last epochAmount epoch, onlineLearn will stop.
      * It is a successful end of cycle.
      *
      * @param epochAmount
      * @param maxErrorFluctuation
      * @return
      */
-    BackPropagationLearnEngineBuilder setStopCondition(int epochAmount, double maxErrorFluctuation);
+    T setStopCondition(int epochAmount, double maxErrorFluctuation);
 
     /**
      * Usually it is protection from long cycles.
@@ -18,7 +18,7 @@ public interface LearnEngineBuilderBase {
      * @param epochAmount
      * @return
      */
-    BackPropagationLearnEngineBuilder setMaxEpochPerCycle(int epochAmount);
+    T setMaxEpochPerCycle(int epochAmount);
 
     /**
      * Criteria to successful stop learning current cycle.
@@ -26,7 +26,16 @@ public interface LearnEngineBuilderBase {
      * @param errorVal
      * @return
      */
-    BackPropagationLearnEngineBuilder setSuccessErrorValue(double errorVal);
+    T setSuccessErrorValue(double errorVal);
+
+
+    /**
+     * Is it permitted to expand NN topology.
+     *
+     * @param isPermitted
+     * @return
+     */
+    T expand(boolean isPermitted);
 
     /**
      * Use in extension topology.
@@ -34,7 +43,7 @@ public interface LearnEngineBuilderBase {
      * @param neurons
      * @return
      */
-    BackPropagationLearnEngineBuilder setMinNeuronsPerLevel(int neurons);
+    T setMinNeuronsPerLevel(int neurons);
 
     /**
      * Use in extension topology.
@@ -42,7 +51,7 @@ public interface LearnEngineBuilderBase {
      * @param neurons
      * @return
      */
-    BackPropagationLearnEngineBuilder setMaxNeuronsPerLevel(int neurons);
+    T setMaxNeuronsPerLevel(int neurons);
 
     /**
      * Use in extension topology.
@@ -50,7 +59,7 @@ public interface LearnEngineBuilderBase {
      * @param levels
      * @return
      */
-    BackPropagationLearnEngineBuilder setMinLevels(int levels);
+    T setMinLevels(int levels);
 
     /**
      * Use in extension topology.
@@ -58,11 +67,11 @@ public interface LearnEngineBuilderBase {
      * @param levels
      * @return
      */
-    BackPropagationLearnEngineBuilder setMaxLevels(int levels);
+    T setMaxLevels(int levels);
 
-    BackPropagationLearnEngineBuilder setDebugMode(DebugLevels debugLevel);
+    T setDebugMode(DebugLevels debugLevel);
 
-    BackPropagationLearnEngineBuilder logErrorFunction(int everyCycles);
+    T logErrorFunction(int everyCycles);
 
     /**
      * Just to investigation goals.
@@ -73,5 +82,6 @@ public interface LearnEngineBuilderBase {
      * @param step
      * @return
      */
-    BackPropagationLearnEngineBuilder useStatModule(boolean on, double range, double step);
+    T useStatModule(boolean on, double range, double step);
+
 }

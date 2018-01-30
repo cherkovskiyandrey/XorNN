@@ -3,18 +3,28 @@ package com.cherkovskiy.neuronNetworks.mlp;
 import com.cherkovskiy.neuronNetworks.api.ActivationFunction;
 import com.cherkovskiy.neuronNetworks.api.NeuronNetwork;
 import com.cherkovskiy.neuronNetworks.api.NeuronNetworkBuilder;
+import com.cherkovskiy.neuronNetworks.api.NeuronNetworkService;
 
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FeedforwardNeuronNetworkBuilderImpl implements NeuronNetworkBuilder {
+    private final NeuronNetworkService neuronNetworkService;
     private ActivationFunction activationFunction;
     private int input;
     private LinkedList<Integer> hiddenLevels = new LinkedList<>();
     private int output;
+
+    public FeedforwardNeuronNetworkBuilderImpl(NeuronNetworkService neuronNetworkService) {
+        this.neuronNetworkService = neuronNetworkService;
+    }
 
     //TODO: move to LearnBuilder
 //    private boolean useStatModule;
@@ -102,8 +112,41 @@ public class FeedforwardNeuronNetworkBuilderImpl implements NeuronNetworkBuilder
     }
 
     @Override
-    public NeuronNetwork build(InputStream fromXml) {
-        throw new UnsupportedOperationException("Method has not been supported yet.");
+    public NeuronNetwork build(InputStream from) throws IOException, ClassNotFoundException {
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(from, StandardCharsets.UTF_8));
+
+        final String type = reader.readLine();
+        if (!FeedforwardNeuronNetworkImpl.TYPE.equalsIgnoreCase(type)) {
+            throw new ClassNotFoundException("Incompatible type of NN: " + type + ". Only " + FeedforwardNeuronNetworkImpl.TYPE + " can be deserialized.");
+        }
+
+        final String uuid = reader.readLine();
+        if (!FeedforwardNeuronNetworkImpl.UUID.equalsIgnoreCase(uuid)) {
+            throw new ClassNotFoundException("Incompatible of UUID. Supported: " + FeedforwardNeuronNetworkImpl.UUID + ". Read: " + uuid);
+        }
+
+        final String actFuncAsStr = reader.readLine();
+        try (InputStream inputStream = Base64.getDecoder().wrap(new ByteArrayInputStream(actFuncAsStr.getBytes(StandardCharsets.UTF_8)))) {
+            this.activationFunction = neuronNetworkService.deserializeActFuncFrom(inputStream);
+        }
+
+        this.input = Integer.parseInt(reader.readLine());
+        this.output = Integer.parseInt(reader.readLine());
+
+        int topologySize = Integer.parseInt(reader.readLine());
+        final double[][] topology = NeuronNetworkCoreHelper.nanArray(topologySize, topologySize);
+        for (int i = 0; i < topologySize; i++) {
+            final int levelIdx = i;
+            final String level = reader.readLine();
+            Arrays.stream(level.split(";"))
+                    .filter(((Predicate<String>) String::isEmpty).negate())
+                    .forEach(str -> {
+                        final String[] pair = str.split(":");
+                        topology[levelIdx][Integer.parseInt(pair[0])] = Double.parseDouble(pair[1]);
+                    });
+        }
+
+        return new FeedforwardNeuronNetworkImpl(input, topology, output, activationFunction);
     }
 
 
